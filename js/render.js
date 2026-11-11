@@ -702,8 +702,8 @@
         const map = S.dt[it.p + '' + it.eyes]; if (m.material.map !== map) m.material.map = map;
         const tr = it.a < 0.999; if (m.material.transparent !== tr) { m.material.transparent = tr; m.material.needsUpdate = true; }
         m.material.opacity = it.a; m.castShadow = !tr;
-        m.material.emissive.setRGB(it.win ? 0.22 : 0, it.win ? 0.13 : 0, it.win ? 0.03 : 0);
-        if (it.win && hi < S.halo.length) { const h = S.halo[hi++]; h.visible = true; h.position.set(it.x, it.y, 0.56); const q = 2.5 + 0.35 * Math.sin(now / 160 + it.x); h.scale.set(q, q, 1); h.material.opacity = 0.5 + 0.18 * Math.sin(now / 130 + it.y); }
+        m.material.emissive.setRGB(it.win ? 0.1 : 0, it.win ? 0.06 : 0, it.win ? 0.01 : 0);
+        if (it.win && hi < S.halo.length) { const h = S.halo[hi++]; h.visible = true; h.position.set(it.x, it.y, 0.56); const q = 2.3 + 0.3 * Math.sin(now / 160 + it.x); h.scale.set(q, q, 1); h.material.opacity = 0.17 + 0.07 * Math.sin(now / 130 + it.y); }
         if (it.win && Math.random() < dt * 9) this.puff(it.x + (Math.random() - 0.5) * 0.7, it.y + (Math.random() - 0.5) * 0.7, 1, 0.5, 1.2);
       }
       for (; hi < S.halo.length; hi++) S.halo[hi].visible = false;
