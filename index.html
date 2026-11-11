@@ -1,4 +1,176 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>四ツ目のダルマ</title>
-<style>html,body{height:100%;margin:0;background:#07060c;color:#e9c46a;font-family:serif;display:flex;align-items:center;justify-content:center;text-align:center}p{letter-spacing:.2em}</style></head>
-<body><p>四ツ目のダルマ<br>準備中</p></body></html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5RB6XMN0QR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5RB6XMN0QR');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#07060c">
+<meta name="description" content="交互にダルマを落として4つ並べたら勝ち。3ターンごとに、予告された段がだるま落としで抜ける！">
+<title>四ツ目のダルマ</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="なすびのお庭">
+<meta property="og:title" content="四ツ目のダルマ">
+<meta property="og:description" content="4つ並べたら勝ち。でも3ターンごとに、だるま落としで段が抜ける。縁日の夜の、漆と金の対戦ゲーム。">
+<meta property="og:url" content="https://nasubi-no-oniwa.github.io/yotsume/">
+<meta property="og:image" content="https://nasubi-no-oniwa.github.io/yotsume/ogp.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://nasubi-no-oniwa.github.io/yotsume/ogp.png">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="四ツ目のダルマ">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kaisei+Tokumin:wght@700;800&family=Shippori+Mincho+B1:wght@500;700;800&family=Yuji+Syuku&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<!-- nasubi-track: 結果画面とXへの投稿の回数を記録（ゲームの動きには影響しない） -->
+<script>(function(){try{var G="yotsume",IDS=["ov-result"];
+function ev(n){try{if(typeof gtag==='function')gtag('event',n,{game:G});}catch(e){}}
+var o=window.open;window.open=function(u){try{if(/intent\/(post|tweet)/.test(String(u)))ev('x_share');}catch(e){}return o.apply(window,arguments);};
+if(!IDS.length)return;
+function vis(e){if(!e||!e.isConnected||e.closest('[hidden]'))return false;var r=e.getBoundingClientRect();if(r.width<1||r.height<1)return false;for(var n=e;n&&n.nodeType===1;n=n.parentElement){var s=getComputedStyle(n);if(s.display==='none'||s.visibility==='hidden'||parseFloat(s.opacity)<0.05)return false;}return true;}
+var was={};setInterval(function(){try{var any=false;for(var i=0;i<IDS.length;i++){if(vis(document.getElementById(IDS[i])))any=true;}if(any&&!was.v)ev('result_view');was.v=any;}catch(e){}},700);
+}catch(e){}})();</script>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div id="app">
+
+  <!-- ===== タイトル ===== -->
+  <section id="title" class="screen active">
+    <div class="title-box">
+      <canvas id="logo-canvas" aria-hidden="true"></canvas>
+      <div class="logo-wrap">
+        <h1 class="logo" data-ih="logo"><small>四ツ目の</small>ダルマ</h1>
+        <span class="seal" aria-hidden="true">福</span>
+      </div>
+      <p class="tagline" data-ih="tagline">交互に落として、4つ並べたら勝ち。<br>でも3ターンごとに、<b>だるま落とし</b>で段が抜ける。</p>
+      <div class="menu">
+        <div class="menu-card">
+          <p class="menu-label"><span data-i="vs_cpu">CPUとたいせん</span></p>
+          <div class="level-row">
+            <button class="btn lv" data-level="easy" data-i="easy">よわい</button>
+            <button class="btn lv" data-level="normal" data-i="normal">ふつう</button>
+            <button class="btn lv" data-level="hard" data-i="hard">つよい</button>
+          </div>
+        </div>
+        <button class="btn wide red" id="btn-local" data-i="local">ふたりで（この端末）</button>
+        <button class="btn wide indigo" id="btn-online" data-i="online">あいことばで対戦</button>
+        <div class="menu-sub">
+          <button class="btn sub" id="btn-howto" data-i="howto">あそびかた</button>
+          <a class="btn sub" href="https://nasubi-no-oniwa.github.io/" data-i="home">なすびのお庭へ</a>
+        </div>
+        <div class="langs" role="group" aria-label="Language"><button type="button" data-lang="ja">日本語</button><button type="button" data-lang="en">English</button><button type="button" data-lang="zh">繁中</button><button type="button" data-lang="ko">한국어</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ゲーム ===== -->
+  <section id="game" class="screen">
+    <header class="hud">
+      <button class="icon-btn" id="btn-menu" aria-label="メニュー"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button>
+      <span class="hud-title" data-i="doc_title">四ツ目のダルマ</span>
+      <button class="icon-btn" id="btn-sound" aria-label="音"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 18V6l10-2v12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/><ellipse cx="6.5" cy="18" rx="2.8" ry="2.2" fill="currentColor"/><ellipse cx="16.5" cy="16" rx="2.8" ry="2.2" fill="currentColor"/></svg></button>
+    </header>
+    <div class="stage">
+      <div class="players">
+        <div class="pcard p1" id="pl1"><canvas class="pface" data-p="1" width="96" height="96"></canvas><div><span class="pname" id="name1">あなた</span><span class="pwins"><b id="wins1">0</b><span data-i="wins_u"> 勝</span></span></div></div>
+        <span class="vs">VS</span>
+        <div class="pcard p2" id="pl2"><div><span class="pname" id="name2">CPU</span><span class="pwins"><b id="wins2">0</b><span data-i="wins_u"> 勝</span></span></div><canvas class="pface" data-p="2" width="96" height="96"></canvas></div>
+      </div>
+      <div class="status" id="status">あなたの番</div>
+      <div class="board-area" id="board-area">
+        <canvas id="board"></canvas>
+      </div>
+      <div class="hammer-bar" id="hammer-bar"><span class="hb-icon" aria-hidden="true"><svg viewBox="0 0 32 32" width="22" height="22"><g transform="rotate(-32 16 16)"><rect x="14.6" y="13" width="2.8" height="16" rx="1.4" fill="#8a5a2b"/><rect x="5" y="4" width="22" height="11" rx="3" fill="#e9c46a" stroke="#7a5412" stroke-width="1"/><rect x="8.4" y="4" width="2.6" height="11" fill="#c8102e"/><rect x="21" y="4" width="2.6" height="11" fill="#c8102e"/></g></svg></span><span id="hammer-text">だるま落としまで あと3ターン</span><span class="hb-dots" id="hammer-dots"></span></div>
+      <p class="hint-line" id="hint-line">落としたい列をタップ</p>
+    </div>
+    <span id="wins" hidden>0 - 0</span>
+    <span class="eyes" id="watchers"></span>
+
+    <div class="overlay" id="ov-result">
+      <div class="dialog result">
+        <div class="result-top"><canvas id="result-daruma" width="120" height="120" aria-hidden="true"></canvas></div>
+        <h2 id="result-title">赤の勝ち！</h2>
+        <p class="result-sub" id="result-sub"></p>
+        <button class="btn wide red" id="btn-again" data-i="again">もう一回</button>
+        <p class="hint" id="again-msg"></p>
+        <button class="btn wide xpost" id="btn-x"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-7.2 8.3L23.3 22h-6.6l-5.2-6.8L5.5 22H2.4l7.7-8.9L1.7 2h6.8l4.7 6.2L18.9 2Zm-1.2 18h1.8L7.4 3.9H5.5L17.7 20Z"/></svg><span data-i="x_post">Xに投稿</span></button>
+        <button class="btn wide sub" id="btn-back" data-i="to_title">タイトルへ</button>
+      </div>
+    </div>
+    <div class="overlay" id="ov-menu">
+      <div class="dialog">
+        <h2 data-i="menu">メニュー</h2>
+        <button class="btn wide" id="btn-resume" data-i="back">もどる</button>
+        <button class="btn wide sub" id="btn-howto2" data-i="howto">あそびかた</button>
+        <button class="btn wide sub" id="btn-quit" data-i="to_title">タイトルへ</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 合言葉 ===== -->
+  <div class="overlay modal" id="ov-online">
+    <div class="dialog">
+      <h2 data-i="online">あいことばで対戦</h2>
+      <div id="online-form">
+        <label class="field-l"><span data-i="passcode">あいことば</span><input id="in-code" maxlength="20" autocomplete="off" placeholder="例：だるま123" data-ip="ex_code"></label>
+        <label class="field-l"><span data-i="name">なまえ</span><input id="in-name" maxlength="8" autocomplete="off" placeholder="ななし" data-ip="noname"></label>
+        <p class="hint" data-i="online_hint">同じあいことばを入れた人と対戦。3人目からは観戦になります。</p>
+        <button class="btn wide red" id="btn-join" data-i="join">はいる</button>
+      </div>
+      <div id="online-wait" hidden>
+        <p class="wait-code"><span data-i="wait_pre">あいことば「</span><b id="wait-code"></b><span data-i="wait_post">」</span></p>
+        <p class="wait-msg" id="wait-msg" data-i="waiting">あいてを待っています…</p>
+        <button class="btn wide sub" id="btn-copy" data-i="copy_link">さそうリンクをコピー</button>
+      </div>
+      <p class="err" id="online-err"></p>
+      <button class="btn wide sub" id="btn-online-close" data-i="back">もどる</button>
+    </div>
+  </div>
+
+  <!-- ===== あそびかた ===== -->
+  <div class="overlay modal" id="ov-howto">
+    <div class="dialog howto">
+      <h2 data-i="howto">あそびかた</h2>
+      <ol>
+        <li data-ih="h1">赤と青が<b>交互に</b>、好きな列の上からダルマを落とす。</li>
+        <li data-ih="h2">縦・横・ななめのどれかで<b>4つ並べたら勝ち</b>。</li>
+        <li data-ih="h3">2人が1回ずつ落として1ターン。<b>3ターンごとに、小槌が指している段がだるま落としで抜けて</b>、上のダルマがストンと落ちる。</li>
+        <li data-ih="h4">小槌の下の数字は「あと何ターンで抜けるか」。下の段ほど選ばれやすい。</li>
+        <li data-ih="h5">抜けた拍子に2人とも4つ並んだら、<b>並んだ列が多いほうの勝ち</b>。同じ数なら、並んだダルマが全部消えて続行（サドンデス）。</li>
+      </ol>
+      <div class="howto-keys">
+        <div><h3 data-i="k_phone">スマホ</h3><p data-i="k_phone_d">落としたい列をタップ</p></div>
+        <div><h3>PC</h3><p data-ih="k_pc_d">列をクリック<br>または ← → で選んで スペース<br>数字キー 1〜7 でも落とせる</p></div>
+      </div>
+      <button class="btn wide" id="btn-howto-close" data-i="close">とじる</button>
+    </div>
+  </div>
+</div>
+<div id="fx-label" aria-hidden="true"><span></span></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script src="js/i18n.js"></script>
+<script src="js/config.js"></script>
+<script src="js/game.js"></script>
+<script src="js/cpu.js"></script>
+<script src="js/three.min.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/render.js"></script>
+<script src="js/online.js"></script>
+<script src="js/qm.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
