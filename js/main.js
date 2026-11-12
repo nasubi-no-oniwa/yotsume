@@ -488,7 +488,7 @@
     else if (L.mode === 'cpu') key = L.mine ? 'x_cpu_win' : 'x_cpu_lose';
     else if (L.mode === 'online' && !L.watch) key = L.mine ? 'x_on_win' : 'x_on_lose';
     else key = 'x_local';
-    const text = T(key, v) + '\n' + T('x_stat', v) + '\n#四ツ目のダルマ';
+    const text = T(key, v) + '\n' + T('x_stat', v) + '\n#四ツ目のダルマ #ブラウザゲーム';
     const url = 'https://nasubi-no-oniwa.github.io/yotsume/';
     window.open('https://x.com/intent/post?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url), '_blank', 'noopener');
   });
